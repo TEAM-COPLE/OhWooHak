@@ -22,7 +22,7 @@ export default function Meal() {
     try {
       const formattedDate = date.toISOString().split('T')[0].replace(/-/g, '');
       const response = await fetch(
-        `https://open.neis.go.kr/hub/mealServiceDietInfo?${process.env.API_KEY}&ATPT_OFCDC_SC_CODE=${ATPT_OFCDC_SC_CODE}&SD_SCHUL_CODE=${SD_SCHUL_CODE}&MLSV_YMD=${formattedDate}&Type=json`,
+        `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=?KEY=${process.env.NEXT_PUBLIC_API_KEY}&ATPT_OFCDC_SC_CODE=${ATPT_OFCDC_SC_CODE}&SD_SCHUL_CODE=${SD_SCHUL_CODE}&MLSV_YMD=${formattedDate}&Type=json`,
       );
       const data = await response.json();
       setMealData(data);
@@ -40,7 +40,7 @@ export default function Meal() {
             <DatePicker
               selected={selectedDate}
               onChange={handleDateChange}
-              className="bg-gray-700 rounded-lg font-bold text-lg mt-2 px-2 w-full text-center"
+              className="bg-gray-700 rounded-lg font-bold text-lg mt-2 px-2 pb-0.5 w-full text-center cursor-pointer text-white"
               popperPlacement="bottom"
               popperModifiers={{
                 offset: {
@@ -58,9 +58,11 @@ export default function Meal() {
             />
 
             <div className="mt-8">
-              {mealData ? (
+              {mealData && mealData.RESULT && mealData.RESULT.CODE === 'INFO-200' ? (
+                <span className="text-2xl font-bold block mt-2">정보가 없습니다.</span>
+              ) : (
                 mealData?.mealServiceDietInfo?.[1]?.row.map((item, index) => (
-                  <span className="text-2xl font-bold block mt-2" key={index}>
+                  <span className="text-2xl font-bold block" key={index}>
                     {item?.DDISH_NM.replace(/\(\d+\)/g, '')
                       .replace(/\([^)]+\)/g, '')
                       .split('<br/>')
@@ -72,8 +74,6 @@ export default function Meal() {
                       ))}
                   </span>
                 ))
-              ) : (
-                <span className="text-2xl font-bold block mt-2">급식 정보가 없습니다.</span>
               )}
             </div>
           </div>

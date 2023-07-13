@@ -7,44 +7,51 @@ import Schedule from './components/Schedule';
 import Community from './components/Community';
 
 export default function Home() {
-  const [schoolName, setSchoolName] = useState('');
+  const [schoolName, setSchoolName] = useState('학교');
   const [schoolData, setSchoolData] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
-    setSchoolName('학교');
+    const cachedSchoolName = localStorage.getItem('SCHUL_NM');
+    if (cachedSchoolName) {
+      setSchoolName(cachedSchoolName);
+    }
   }, []);
 
   const handleSearch = async () => {
-    if (schoolName.trim() === '') {
+    if (inputValue.trim() === '') {
       return;
     }
 
     try {
       const response = await fetch(
-        `https://open.neis.go.kr/hub/schoolInfo?${process.env.API_KEY}&Type=json&SCHUL_NM=${encodeURIComponent(
-          schoolName,
+        `https://open.neis.go.kr/hub/schoolInfo?KEY=?KEY=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&SCHUL_NM=${encodeURIComponent(
+          inputValue,
         )}`,
       );
       const data = await response.json();
       setSchoolData(data);
 
       // Cache the values
-      const { ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE } = data.schoolInfo[1].row[0];
+      const { ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE, ORG_RDNMA, SCHUL_NM, SCHUL_KND_SC_NM } = data.schoolInfo[1].row[0];
       localStorage.setItem('ATPT_OFCDC_SC_CODE', ATPT_OFCDC_SC_CODE);
       localStorage.setItem('SD_SCHUL_CODE', SD_SCHUL_CODE);
+      localStorage.setItem('ORG_RDNMA', ORG_RDNMA);
+      localStorage.setItem('SCHUL_NM', SCHUL_NM);
+      localStorage.setItem('SCHUL_KND_SC_NM', SCHUL_KND_SC_NM);
+
+      setSchoolName(inputValue); // Update schoolName with the entered value
+
+      setModalOpen(false); // Close the modal after saving
     } catch (error) {
       console.log('Error:', error);
     }
   };
 
-  const handleInputChange = event => {
-    setSchoolName(event.target.value);
-  };
-
-  const handleKeyPress = event => {
-    if (event.key === 'Enter') {
-      handleSearch();
-    }
+  const handleClose = () => {
+    setModalOpen(false); // Close the modal
+    setInputValue(''); // Clear the input value
   };
 
   return (
@@ -57,17 +64,11 @@ export default function Home() {
 
       <div className="w-full text-center mt-14">
         <span className="text-4xl font-bold">
-          오늘{' '}
-          <input
-            type="text"
-            alt="school"
-            className="bg-[#202026] px-4 rounded-lg text-center"
-            placeholder="학교이름을 적어주세요!"
-            value={schoolName}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-          />{' '}
-          는?
+          오늘 우리{' '}
+          <button className="bg-gray-700 px-2 rounded-lg" onClick={() => setModalOpen(true)}>
+            {schoolName}
+          </button>
+          는
         </span>
       </div>
 
@@ -92,6 +93,29 @@ export default function Home() {
           <Community />
         </div>
       </div>
+
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-60">
+          <div className="bg-[#202026] p-6 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">학교 선택</h2>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              className="border border-gray-600 bg-gray-700 rounded-lg px-4 py-2 mb-4"
+              placeholder="학교 이름을 입력하세요"
+            />
+            <div className="flex justify-between">
+              <button className="mr-2 bg-red-500 text-white px-4 py-2 rounded-lg" onClick={handleClose}>
+                닫기
+              </button>
+              <button className="ml-2 bg-blue-500 text-white px-4 py-2 rounded-lg" onClick={handleSearch}>
+                저장
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -24,6 +24,11 @@ export default function Home() {
   }, []);
 
   const handleSearch = async () => {
+    if (grade.trim() === '' || classNumber.trim() === '') {
+      window.alert('학년과 반을 입력하세요!');
+      return;
+    }
+
     if (inputValue.trim() === '') {
       return;
     }
@@ -45,7 +50,6 @@ export default function Home() {
   const handleSchoolSelect = school => {
     const { ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE, ORG_RDNMA, SCHUL_NM, SCHUL_KND_SC_NM } = school;
 
-    // Cache the values
     localStorage.setItem('ATPT_OFCDC_SC_CODE', ATPT_OFCDC_SC_CODE);
     localStorage.setItem('SD_SCHUL_CODE', SD_SCHUL_CODE);
     localStorage.setItem('ORG_RDNMA', ORG_RDNMA);

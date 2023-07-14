@@ -10,6 +10,7 @@ export default function Schedule() {
     if (cachedATPT_OFCDC_SC_CODE && cachedSD_SCHUL_CODE) {
       fetchScheduleData(cachedATPT_OFCDC_SC_CODE, cachedSD_SCHUL_CODE);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchScheduleData = async (atptCode, schulCode) => {

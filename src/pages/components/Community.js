@@ -3,7 +3,7 @@ export default function Community() {
     <>
       <div className="bg-[#202026] overflow-auto h-[450px] rounded-lg text-2xl">
         <div className="px-5 py-6">
-          <div className="flex flex-col items-center text-center">
+          <div className="flex flex-col text-center">
             <span className="text-2xl font-bold">커뮤니티</span>
 
             <div className="mt-5">

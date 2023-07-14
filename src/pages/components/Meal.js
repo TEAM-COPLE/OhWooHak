@@ -11,6 +11,7 @@ export default function Meal() {
 
   useEffect(() => {
     fetchMealData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDateChange = date => {

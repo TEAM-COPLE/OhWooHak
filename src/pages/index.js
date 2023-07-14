@@ -75,6 +75,30 @@ export default function Home() {
     setClassNumber('');
   };
 
+  const handleKeyPress = event => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = event => {
+      if (event.key === 'Escape') {
+        setModalOpen(false);
+        setInputValue('');
+        setSchoolList([]);
+        setGrade('');
+        setClassNumber('');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <>
       <Head>
@@ -117,7 +141,7 @@ export default function Home() {
 
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-60">
-          <div className="bg-[#202026] p-6 rounded-lg">
+          <div className="bg-[#202026] p-6 rounded-lg overflow-auto h-[280px]">
             <h2 className="text-xl font-bold mb-4">기본 정보 입력</h2>
             <div className="gird grid-cols-2 gap-4 mb-2">
               <input
@@ -141,6 +165,7 @@ export default function Home() {
               type="text"
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
               className="border border-gray-600 bg-gray-700 rounded-lg w-full px-2 py-2 mb-4"
               placeholder="학교 이름을 입력하세요"
             />

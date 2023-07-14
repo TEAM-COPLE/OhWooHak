@@ -10,41 +10,78 @@ export default function Timetable() {
   const [SD_SCHUL_CODE, setSD_SCHUL_CODE] = useState('');
   const [grade, setGrade] = useState('');
   const [classNumber, setClassNumber] = useState('');
+  const [SCHUL_KND_SC_NM, setSCHUL_KND_SC_NM] = useState('');
 
   useEffect(() => {
     const cachedATPT_OFCDC_SC_CODE = localStorage.getItem('ATPT_OFCDC_SC_CODE');
     const cachedSD_SCHUL_CODE = localStorage.getItem('SD_SCHUL_CODE');
     const cachedGrade = localStorage.getItem('GRADE');
     const cachedClassNumber = localStorage.getItem('CLASS_NUMBER');
+    const cachedSCHUL_KND_SC_NM = localStorage.getItem('SCHUL_KND_SC_NM');
 
     if (cachedATPT_OFCDC_SC_CODE && cachedSD_SCHUL_CODE) {
       setATPT_OFCDC_SC_CODE(cachedATPT_OFCDC_SC_CODE);
       setSD_SCHUL_CODE(cachedSD_SCHUL_CODE);
       setGrade(cachedGrade);
       setClassNumber(cachedClassNumber);
+      setSCHUL_KND_SC_NM(cachedSCHUL_KND_SC_NM);
     }
   }, []);
 
   useEffect(() => {
     if (ATPT_OFCDC_SC_CODE && SD_SCHUL_CODE) {
-      fetchTimetableData(ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE, selectedDate);
+      fetchTimetableData(ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE, selectedDate, SCHUL_KND_SC_NM);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE, selectedDate]);
+  }, [ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE, selectedDate, SCHUL_KND_SC_NM]);
 
   const handleDateChange = date => {
     setSelectedDate(date);
   };
 
-  const fetchTimetableData = async (atptCode, schulCode, date) => {
+  const fetchTimetableData = async (atptCode, schulCode, date, schulKnd) => {
     try {
       const formattedDate = formatDate(date);
+      let apiUrl;
+
+      switch (schulKnd) {
+        case '초등학교':
+          apiUrl = `https://open.neis.go.kr/hub/elsTimetable`;
+          break;
+        case '중학교':
+          apiUrl = `https://open.neis.go.kr/hub/misTimetable`;
+          break;
+        case '고등학교':
+          apiUrl = `https://open.neis.go.kr/hub/hisTimetable`;
+          break;
+        default:
+          console.log('Invalid school type');
+          return;
+      }
 
       const response = await fetch(
-        `https://open.neis.go.kr/hub/hisTimetable?KEY=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&ATPT_OFCDC_SC_CODE=${atptCode}&SD_SCHUL_CODE=${schulCode}&ALL_TI_YMD=${formattedDate}&GRADE=${grade}&CLASS_NM=${classNumber}`,
+        `${apiUrl}?KEY=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&ATPT_OFCDC_SC_CODE=${atptCode}&SD_SCHUL_CODE=${schulCode}&ALL_TI_YMD=${formattedDate}&GRADE=${grade}&CLASS_NM=${classNumber}`,
       );
       const data = await response.json();
-      setTimetableData(data?.hisTimetable[1]?.row || []);
+
+      let parsedData = [];
+
+      switch (schulKnd) {
+        case '초등학교':
+          parsedData = parseElementarySchoolData(data);
+          break;
+        case '중학교':
+          parsedData = parseMiddleSchoolData(data);
+          break;
+        case '고등학교':
+          parsedData = parseHighSchoolData(data);
+          break;
+        default:
+          console.log('Invalid school type');
+          break;
+      }
+
+      setTimetableData(parsedData);
     } catch (error) {
       console.log('Error:', error);
     }
@@ -58,15 +95,16 @@ export default function Timetable() {
     return `${year}${month}${day}`;
   };
 
-  const removeDuplicateNumbers = str => {
-    const digits = str.match(/\d+/g);
-    const uniqueDigits = Array.from(new Set(digits));
+  const parseElementarySchoolData = data => {
+    return data?.elsTimetable[1]?.row || [];
+  };
 
-    if (uniqueDigits.length > 1) {
-      return uniqueDigits[0];
-    }
+  const parseMiddleSchoolData = data => {
+    return data?.misTimetable[1]?.row || [];
+  };
 
-    return str;
+  const parseHighSchoolData = data => {
+    return data?.hisTimetable[1]?.row || [];
   };
 
   const removeDuplicatePerio = data => {

@@ -103,7 +103,7 @@ export default function Home() {
     <>
       <Head>
         <title>오우학</title>
-        <meta name="description" content="니인살" />
+        <meta name="description" content="오늘 우리 학교는" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 

@@ -35,7 +35,7 @@ export default function Home() {
 
     try {
       const response = await fetch(
-        `https://open.neis.go.kr/hub/schoolInfo?KEY=?KEY=${
+        `https://open.neis.go.kr/hub/schoolInfo?KEY=${
           process.env.NEXT_PUBLIC_API_KEY
         }&Type=json&SCHUL_NM=${encodeURIComponent(inputValue)}`,
       );

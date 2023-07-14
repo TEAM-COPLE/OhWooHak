@@ -110,7 +110,7 @@ export default function Home() {
       <div className="w-full text-center mt-14">
         <span className="text-4xl font-bold">
           오늘 우리{' '}
-          <button className="bg-gray-700 px-2 rounded-lg" onClick={() => setModalOpen(true)}>
+          <button className="bg-gray-700 px-2 rounded-lg pb-0.5" onClick={() => setModalOpen(true)}>
             {schoolName}
           </button>
           는

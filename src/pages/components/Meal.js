@@ -34,7 +34,7 @@ export default function Meal() {
 
   return (
     <>
-      <div className="bg-[#202026] h-[450px] rounded-lg text-2xl">
+      <div className="bg-[#202026] h-[450px] overflow-auto rounded-lg text-2xl">
         <div className="px-5 py-6">
           <div className="flex flex-col items-center text-center">
             <span className="text-2xl font-bold">오늘의 급식</span>
@@ -63,7 +63,7 @@ export default function Meal() {
                 <span className="text-2xl font-bold block mt-2">정보가 없습니다.</span>
               ) : (
                 mealData?.mealServiceDietInfo?.[1]?.row.map((item, index) => (
-                  <span className="text-2xl font-bold block" key={index}>
+                  <span className="text-xl font-bold block" key={index}>
                     {item?.DDISH_NM.replace(/\(\d+\)/g, '')
                       .replace(/\([^)]+\)/g, '')
                       .split('<br/>')

@@ -10,7 +10,6 @@ import Community from './components/Community';
 export default function Home() {
   const router = useRouter();
   const [schoolName, setSchoolName] = useState('학교');
-  const [schoolData, setSchoolData] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [schoolList, setSchoolList] = useState([]);

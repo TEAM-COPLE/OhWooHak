@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import ko from 'date-fns/locale/ko';
@@ -32,7 +33,7 @@ export default function Timetable() {
     if (ATPT_OFCDC_SC_CODE && SD_SCHUL_CODE) {
       fetchTimetableData(ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE, selectedDate, SCHUL_KND_SC_NM);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ATPT_OFCDC_SC_CODE, SD_SCHUL_CODE, selectedDate, SCHUL_KND_SC_NM]);
 
   const handleDateChange = date => {
@@ -59,10 +60,19 @@ export default function Timetable() {
           return;
       }
 
-      const response = await fetch(
-        `${apiUrl}?KEY=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&ATPT_OFCDC_SC_CODE=${atptCode}&SD_SCHUL_CODE=${schulCode}&ALL_TI_YMD=${formattedDate}&GRADE=${grade}&CLASS_NM=${classNumber}`,
-      );
-      const data = await response.json();
+      const response = await axios.get(apiUrl, {
+        params: {
+          KEY: process.env.NEXT_PUBLIC_NEIS_API_KEY,
+          Type: 'json',
+          ATPT_OFCDC_SC_CODE: atptCode,
+          SD_SCHUL_CODE: schulCode,
+          ALL_TI_YMD: formattedDate,
+          GRADE: grade,
+          CLASS_NM: classNumber,
+        },
+      });
+
+      const data = response.data;
 
       let parsedData = [];
 
@@ -153,13 +163,13 @@ export default function Timetable() {
                 removeDuplicatePerio(timetableData).map((item, index) => (
                   <div
                     key={index}
-                    className="flex w-full items-center justify-center border-gray-600 py-2 bg-gray-700 mb-2 px-2 py-2 rounded-lg"
+                    className="flex items-center justify-center border-gray-600 py-2 bg-gray-700 mb-2 px-2 py-2 rounded-lg"
                   >
-                    <span className="text-base font-bold">{item.ITRT_CNTNT.replace(/[^a-zA-Z0-9가-힣]/g, '')}</span>
+                    <span className="text-xl font-bold">{item.ITRT_CNTNT.replace(/[^a-zA-Z0-9가-힣]/g, '')}</span>
                   </div>
                 ))
               ) : (
-                <span className="text-2xl font-bold block mt-2">정보가 없습니다.</span>
+                <span className="text-xl font-bold block mt-2">정보가 없습니다.</span>
               )}
             </div>
           </div>

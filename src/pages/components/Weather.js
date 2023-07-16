@@ -4,7 +4,9 @@ import { WiCloud, WiDaySunny, WiCloudy, WiShowers, WiSnow, WiRaindrops, WiRainMi
 
 export default function Weather() {
   const [weatherData, setWeatherData] = useState(null);
-  const [LNA, setLNA] = useState(null);
+  const [X, setX] = useState(55);
+  const [Y, setY] = useState(127);
+  const [LNA, setLNA] = useState('서울 중구');
 
   useEffect(() => {
     const getWeather = async () => {
@@ -13,7 +15,9 @@ export default function Weather() {
         const cachedY = localStorage.getItem('Y');
         const cachedLNA = localStorage.getItem('LNA');
 
-        if (cachedLNA) {
+        if (cachedX && cachedY && cachedLNA) {
+          setX(cachedX);
+          setY(cachedY);
           setLNA(cachedLNA);
         }
 
@@ -28,7 +32,7 @@ export default function Weather() {
           .replace(/-/g, '');
 
         const response = await axios.get(
-          `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?ServiceKey=${process.env.NEXT_PUBLIC_DATA_API_KEY}&numOfRows=1000&pageNo=1&dataType=JSON&base_date=${apiDate}&base_time=1100&nx=${cachedX}&ny=${cachedY}`,
+          `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?ServiceKey=${process.env.NEXT_PUBLIC_DATA_API_KEY}&numOfRows=1000&pageNo=1&dataType=JSON&base_date=${apiDate}&base_time=1100&nx=${X}&ny=${Y}`,
         );
 
         const data = response.data;

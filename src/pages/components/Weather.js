@@ -48,6 +48,7 @@ export default function Weather() {
     };
 
     getWeather();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getWeatherIcon = (skyCode, ptyCode) => {

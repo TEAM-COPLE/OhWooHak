@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export default function Schedule() {
   const [scheduleData, setScheduleData] = useState(null);
@@ -10,7 +11,7 @@ export default function Schedule() {
     if (cachedATPT_OFCDC_SC_CODE && cachedSD_SCHUL_CODE) {
       fetchScheduleData(cachedATPT_OFCDC_SC_CODE, cachedSD_SCHUL_CODE);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchScheduleData = async (atptCode, schulCode) => {
@@ -21,11 +22,18 @@ export default function Schedule() {
       const formattedToday = formatDate(today);
       const formattedLastDayOfYear = formatDate(lastDayOfYear);
 
-      const response = await fetch(
-        `https://open.neis.go.kr/hub/SchoolSchedule?KEY=${process.env.NEXT_PUBLIC_API_KEY}&Type=json&ATPT_OFCDC_SC_CODE=${atptCode}&SD_SCHUL_CODE=${schulCode}&AA_FROM_YMD=${formattedToday}&AA_TO_YMD=${formattedLastDayOfYear}`,
-      );
-      const data = await response.json();
-      setScheduleData(data.SchoolSchedule);
+      const response = await axios.get(`https://open.neis.go.kr/hub/SchoolSchedule`, {
+        params: {
+          KEY: process.env.NEXT_PUBLIC_NEIS_API_KEY,
+          Type: 'json',
+          ATPT_OFCDC_SC_CODE: atptCode,
+          SD_SCHUL_CODE: schulCode,
+          AA_FROM_YMD: formattedToday,
+          AA_TO_YMD: formattedLastDayOfYear,
+        },
+      });
+      const data = response.data.SchoolSchedule;
+      setScheduleData(data);
     } catch (error) {
       console.log('Error:', error);
     }
@@ -60,16 +68,18 @@ export default function Schedule() {
             <span className="text-2xl font-bold">오늘의 일정</span>
 
             {scheduleData && scheduleData[1]?.row ? (
-              scheduleData[1].row.map((item, index) => (
-                <div className="mt-5 w-full" key={index}>
-                  <div className="flex flex-col items-center text-center bg-gray-700 rounded-lg px-2 pb-2">
-                    <span className="text-base text-gray-300 font-bold block mt-2">
-                      {formatLocalizedDate(item?.AA_YMD)}
-                    </span>
-                    <span className="text-xl font-bold block mt-2">{item?.EVENT_NM}</span>
+              scheduleData[1].row
+                .filter(item => !item?.EVENT_NM.includes('토요휴업일')) // Filter out items with "토요휴업일"
+                .map((item, index) => (
+                  <div className="mt-5 w-full" key={index}>
+                    <div className="flex flex-col items-center text-center bg-gray-700 rounded-lg px-2 pb-2">
+                      <span className="text-base text-gray-300 font-bold block mt-2">
+                        {formatLocalizedDate(item?.AA_YMD)}
+                      </span>
+                      <span className="text-xl font-bold block mt-2">{item?.EVENT_NM}</span>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))
             ) : (
               <span className="text-2xl font-bold block mt-2">정보가 없습니다.</span>
             )}

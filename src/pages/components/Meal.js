@@ -11,7 +11,7 @@ export default function Meal() {
 
   useEffect(() => {
     fetchMealData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDateChange = date => {
@@ -23,7 +23,7 @@ export default function Meal() {
     try {
       const formattedDate = date.toISOString().split('T')[0].replace(/-/g, '');
       const response = await fetch(
-        `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=?KEY=${process.env.NEXT_PUBLIC_API_KEY}&ATPT_OFCDC_SC_CODE=${ATPT_OFCDC_SC_CODE}&SD_SCHUL_CODE=${SD_SCHUL_CODE}&MLSV_YMD=${formattedDate}&Type=json`,
+        `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${process.env.NEXT_PUBLIC_NEIS_API_KEY}&ATPT_OFCDC_SC_CODE=${ATPT_OFCDC_SC_CODE}&SD_SCHUL_CODE=${SD_SCHUL_CODE}&MLSV_YMD=${formattedDate}&Type=json`,
       );
       const data = await response.json();
       setMealData(data);
@@ -58,24 +58,41 @@ export default function Meal() {
               locale={ko}
             />
 
-            <div className="mt-8">
-              {mealData && mealData.RESULT && mealData.RESULT.CODE === 'INFO-200' ? (
-                <span className="text-2xl font-bold block mt-2">정보가 없습니다.</span>
-              ) : (
-                mealData?.mealServiceDietInfo?.[1]?.row.map((item, index) => (
-                  <span className="text-xl font-bold block" key={index}>
-                    {item?.DDISH_NM.replace(/\(\d+\)/g, '')
+            <div>
+              {mealData?.mealServiceDietInfo?.[1]?.row.map((item, index) => (
+                <span className="text-2xl font-bold block" key={index}>
+                  {(() => {
+                    // Function to handle the meal type based on MMEAL_SC_CODE
+                    const getMealType = mmealScCode => {
+                      if (mmealScCode === '1') return '조식';
+                      if (mmealScCode === '2') return '중식';
+                      if (mmealScCode === '3') return '야식';
+                      return '기타';
+                    };
+
+                    const mealType = getMealType(item?.MMEAL_SC_CODE);
+
+                    const mealDishes = item?.DDISH_NM.replace(/\(\d+\)/g, '')
                       .replace(/\([^)]+\)/g, '')
                       .split('<br/>')
                       .map((dish, i) => (
                         <React.Fragment key={i}>
-                          {dish}
                           <br />
+                          {dish.trim()}
                         </React.Fragment>
-                      ))}
-                  </span>
-                ))
-              )}
+                      ));
+
+                    return (
+                      <React.Fragment key={index}>
+                        <br />
+                        <span className="text-2xl text-gray-400 font-bold">{mealType}</span>
+                        <br />
+                        {mealDishes}
+                      </React.Fragment>
+                    );
+                  })()}
+                </span>
+              ))}
             </div>
           </div>
         </div>

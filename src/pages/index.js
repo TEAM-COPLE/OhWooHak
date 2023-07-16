@@ -185,6 +185,7 @@ export default function Home() {
         <title>오우학</title>
         <meta name="description" content="오늘 우리 학교는" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
       </Head>
 
       <div className="w-full text-center mt-14">

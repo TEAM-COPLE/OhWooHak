@@ -14,10 +14,10 @@ export default function Meal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleDateChange = date => {
-  setSelectedDate(date);
-  fetchMealData(date); 
-};
+  const handleDateChange = date => { 
+     setSelectedDate(date); 
+     fetchMealData(date); 
+   }; 
 
 
   const fetchMealData = async (date = selectedDate) => {

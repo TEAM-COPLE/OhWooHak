@@ -15,9 +15,10 @@ export default function Meal() {
   }, []);
 
   const handleDateChange = date => {
-    setSelectedDate(date);
-    fetchMealData(date);
-  };
+  setSelectedDate(date);
+  fetchMealData(date); 
+};
+
 
   const fetchMealData = async (date = selectedDate) => {
     try {

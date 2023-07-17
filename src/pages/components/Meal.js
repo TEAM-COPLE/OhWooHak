@@ -15,9 +15,10 @@ export default function Meal() {
   }, []);
 
   const handleDateChange = date => {
-    setSelectedDate(date);
-    fetchMealData(date);
-  };
+  setSelectedDate(date);
+  fetchMealData(date); 
+};
+
 
   const fetchMealData = async (date = selectedDate) => {
     try {
@@ -41,7 +42,7 @@ export default function Meal() {
             <DatePicker
               selected={selectedDate}
               onChange={handleDateChange}
-              className="bg-gray-700 rounded-lg font-bold text-lg mt-2 px-2 pb-0.5 w-full text-center cursor-pointer text-white"
+              className="bg-gray-700 rounded-lg font-bold text-lg mt-2 px-2 pb-0.5 w-full text-center cursor-pointer"
               popperPlacement="bottom"
               popperModifiers={{
                 offset: {
